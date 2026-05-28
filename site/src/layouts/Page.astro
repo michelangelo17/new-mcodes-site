@@ -1,0 +1,44 @@
+---
+// A plain page layout for non-post pages (about, contact, etc.).
+// BlogPost.astro is for content collection entries; this is for everything else.
+
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<h1>{title}</h1>
+			<div class="prose">
+				<slot />
+			</div>
+		</main>
+		<Footer />
+
+		<style>
+			main h1 {
+				margin-bottom: 2rem;
+			}
+			.prose :global(a) {
+				border-bottom: 1px solid var(--border);
+			}
+			.prose :global(a:hover) {
+				border-bottom-color: currentColor;
+			}
+		</style>
+	</body>
+</html>

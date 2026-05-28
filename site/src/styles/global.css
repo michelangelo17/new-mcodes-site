@@ -1,0 +1,253 @@
+/*
+  Global styles. Single palette token set, light by default, dark via
+  prefers-color-scheme. One accent (deep summer-sky blue) used sparingly.
+
+  Three fonts, each in its lane:
+    --font-heading  Space Grotesk     (headings)
+    --font-body     iA Writer Quattro (body)
+    --font-mono     Fira Code         (code + brand; ligatures on)
+  All self-hosted via Astro's local provider — no runtime third-party request.
+
+  Layout is fluid: a reading-width column for prose, a wider one for chrome and
+  the landing/list pages, and a gutter that grows with the viewport so the page
+  fills a desktop screen instead of looking like a phone in the middle of it.
+
+  Originally based on Bear Blog's default
+  (https://github.com/HermanMartinus/bearblog), then rebuilt for a quieter,
+  more modern feel.
+*/
+
+:root {
+	color-scheme: light dark;
+
+	/* --font-body, --font-heading and --font-mono are injected by Astro's
+	   <Font> component (see astro.config.mjs). */
+
+	/* Layout widths. Reading stays a comfortable measure for long-form text;
+	   wide is for chrome and pages without long prose; gutter scales with the
+	   viewport. */
+	--reading: 52rem;
+	--wide: 86rem;
+	--gutter: clamp(1.25rem, 4vw, 4rem);
+
+	/* Light mode tokens. */
+	--bg: #f6f7f9;
+	--bg-elev: #ffffff;
+	--text: #0f172a;
+	--text-muted: #475569;
+	--text-faint: #94a3b8;
+	--border: #e2e8f0;
+	--accent: #1e40af;
+	--accent-hover: #1e3a8a;
+	--code-bg: #eef2f7;
+	--selection-bg: rgba(30, 64, 175, 0.18);
+	/* Soft summer-sky glow behind the home hero (home page only). */
+	--glow: rgba(30, 64, 175, 0.13);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #0d111c;
+		--bg-elev: #141a28;
+		--text: #e6e9ef;
+		--text-muted: #94a3b8;
+		--text-faint: #64748b;
+		--border: #1f2638;
+		--accent: #60a5fa;
+		--accent-hover: #93c5fd;
+		--code-bg: #1a2236;
+		--selection-bg: rgba(96, 165, 250, 0.22);
+		--glow: rgba(96, 165, 250, 0.16);
+	}
+}
+
+* {
+	box-sizing: border-box;
+}
+
+::selection {
+	background: var(--selection-bg);
+	color: var(--text);
+}
+
+html {
+	background: var(--bg);
+}
+
+body {
+	font-family: var(--font-body);
+	margin: 0;
+	padding: 0;
+	background: var(--bg);
+	color: var(--text);
+	/* Scales ~16px (mobile) to ~18.5px (large desktop). */
+	font-size: clamp(1rem, 0.96rem + 0.2vw, 1.15rem);
+	line-height: 1.7;
+	text-align: left;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	/* Sticky-footer layout: header / main / footer stack full-height so the
+	   footer pins to the bottom of the viewport on short pages instead of
+	   floating with a void beneath it. */
+	display: flex;
+	flex-direction: column;
+	min-height: 100dvh;
+}
+
+/* Default content container: the reading column. Landing and list pages widen
+   this to var(--wide) in their own scoped styles. flex: 1 makes main absorb
+   the leftover height, pushing the footer down. */
+main {
+	flex: 1 0 auto;
+	width: 100%;
+	max-width: var(--reading);
+	margin-inline: auto;
+	padding: 3rem var(--gutter) 5rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading), system-ui, sans-serif;
+	margin: 1.75em 0 0.5em 0;
+	color: var(--text);
+	line-height: 1.22;
+	font-weight: 700;
+	letter-spacing: -0.015em;
+}
+h1 {
+	font-size: clamp(1.85rem, 1.45rem + 1.5vw, 2.6rem);
+	margin-top: 0;
+}
+h2 {
+	font-size: clamp(1.4rem, 1.2rem + 0.7vw, 1.8rem);
+}
+h3 {
+	font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.45rem);
+}
+h4 {
+	font-size: 1.1rem;
+}
+h5,
+h6 {
+	font-size: 1rem;
+}
+
+p {
+	margin: 0 0 1.2em 0;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+	transition: color 120ms ease, border-color 120ms ease;
+}
+a:hover {
+	color: var(--accent-hover);
+	border-bottom-color: currentColor;
+}
+
+strong,
+b {
+	font-weight: 700;
+	color: var(--text);
+}
+
+hr {
+	border: none;
+	border-top: 1px solid var(--border);
+	margin: 2em 0;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 6px;
+}
+
+code,
+pre {
+	font-family: var(--font-mono), ui-monospace, Menlo, Consolas, monospace;
+	/* Fira Code's programming ligatures (=>, ->, !=, >=, ===, etc). `calt`
+	   (contextual alternates) drives them; the self-hosted Fontsource build
+	   ships it, which is the whole reason for the swap. */
+	font-feature-settings: 'calt' 1;
+	font-variant-ligatures: contextual;
+}
+code {
+	font-size: 0.92em;
+	padding: 0.1em 0.35em;
+	background: var(--code-bg);
+	color: var(--text);
+	border-radius: 4px;
+}
+
+pre {
+	padding: 1.1em 1.25em;
+	border-radius: 8px;
+	background: var(--code-bg);
+	overflow-x: auto;
+	font-size: 0.88em;
+	line-height: 1.6;
+	margin: 1.5em 0;
+}
+pre > code {
+	all: unset;
+	font-family: inherit;
+	font-feature-settings: 'calt' 1;
+	font-variant-ligatures: contextual;
+}
+
+blockquote {
+	border-left: 2px solid var(--accent);
+	padding: 0.2em 0 0.2em 1.1em;
+	margin: 1.5em 0;
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+ul,
+ol {
+	padding-left: 1.4em;
+	margin: 0 0 1.1em 0;
+}
+li {
+	margin-bottom: 0.4em;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1.5em 0;
+}
+th,
+td {
+	padding: 0.5em 0.75em;
+	border-bottom: 1px solid var(--border);
+	text-align: left;
+}
+
+@media (max-width: 45rem) {
+	main {
+		padding: 2rem var(--gutter) 3rem;
+	}
+}
+
+.sr-only {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

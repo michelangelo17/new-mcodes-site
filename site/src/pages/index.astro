@@ -1,0 +1,235 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+// The landing page doubles as a most-recent-writing teaser. The full list
+// lives at /blog. Keep the top few only — anything older belongs on the index
+// page, not the front door.
+const recent = (await getCollection('posts'))
+	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+	.slice(0, 4);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body class="landing">
+		<Header />
+		<main>
+			<div class="home">
+				<section class="intro">
+					{/* Allow a break only after the dot, so the wordmark stacks
+					   as "michelangelo." / "codes" if it must wrap — never
+					   mid-segment. */}
+					<h1 set:html={SITE_TITLE.replace(/\./g, '.<wbr>')}></h1>
+					<p>{SITE_DESCRIPTION}</p>
+					<p class="about-link"><a href="/about">More about me →</a></p>
+				</section>
+
+				<section class="recent">
+					<h2>Recent writing</h2>
+					<ul>
+						{
+							recent.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										<h3 class="title">{post.data.title}</h3>
+										<p class="date">
+											<FormattedDate date={post.data.date} />
+										</p>
+										<p class="summary">{post.data.summary}</p>
+									</a>
+								</li>
+							))
+						}
+					</ul>
+					<p class="more"><a href="/blog">All writing →</a></p>
+				</section>
+			</div>
+
+			{/* B: an abstract node/edge motif — agents and the seams between
+			    them, the thing the writing is about. Decorative only, sits
+			    behind the content at low contrast. */}
+			<svg class="motif" viewBox="0 0 480 360" fill="none" aria-hidden="true">
+				<g class="edges">
+					<line x1="58" y1="70" x2="205" y2="135" />
+					<line x1="205" y1="135" x2="360" y2="62" />
+					<line x1="205" y1="135" x2="300" y2="258" />
+					<line x1="300" y1="258" x2="438" y2="300" />
+					<line x1="58" y1="70" x2="118" y2="232" />
+					<line x1="118" y1="232" x2="300" y2="258" />
+					<line x1="360" y1="62" x2="438" y2="300" />
+					<line x1="360" y1="62" x2="205" y2="135" />
+				</g>
+				<g class="nodes">
+					<circle cx="58" cy="70" r="6" />
+					<circle cx="205" cy="135" r="10" class="hot" />
+					<circle cx="360" cy="62" r="6" />
+					<circle cx="300" cy="258" r="8" class="hot" />
+					<circle cx="118" cy="232" r="5" />
+					<circle cx="438" cy="300" r="6" />
+				</g>
+			</svg>
+		</main>
+		<Footer />
+
+		<style>
+			/* Soft summer-sky glow behind the hero, home page only. Layered
+			   over the base background; sits below the (opaque) header. */
+			body.landing {
+				background:
+					radial-gradient(48rem 30rem at 60% -4rem, var(--glow), transparent 70%),
+					var(--bg);
+				background-repeat: no-repeat;
+			}
+
+			main {
+				max-width: var(--wide);
+				/* Center the hero block vertically in the leftover viewport
+				   height. When the post list grows past one screen this just
+				   behaves like top-aligned. */
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				position: relative;
+			}
+			.home {
+				display: grid;
+				gap: 3rem;
+				width: 100%;
+				position: relative;
+				z-index: 1;
+			}
+
+			/* B: node/seam motif, behind the content. */
+			.motif {
+				position: absolute;
+				top: 1.5rem;
+				right: calc(var(--gutter) * -0.5);
+				width: min(40vw, 30rem);
+				height: auto;
+				z-index: 0;
+				opacity: 0.55;
+				pointer-events: none;
+			}
+			.motif .edges line {
+				stroke: var(--text-faint);
+				stroke-width: 1.25;
+				stroke-opacity: 0.6;
+			}
+			.motif .nodes circle {
+				fill: var(--text-faint);
+			}
+			.motif .nodes circle.hot {
+				fill: var(--accent);
+			}
+			/* On a single column (mobile/tablet) the motif would collide with
+			   text; hide it there. */
+			@media (max-width: 60rem) {
+				.motif {
+					display: none;
+				}
+			}
+			/* Two columns on desktop: identity on the left, writing on the
+			   right. The left column sticks as you scroll the list. */
+			@media (min-width: 60rem) {
+				.home {
+					grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+					gap: 5rem;
+					align-items: start;
+				}
+				.intro {
+					position: sticky;
+					top: 6rem;
+				}
+			}
+
+			.intro h1 {
+				margin: 0 0 0.75rem 0;
+				font-size: clamp(2.1rem, 1.5rem + 2vw, 2.9rem);
+				line-height: 1.05;
+				/* Override the body's break-anywhere wrapping; only the <wbr>
+				   after the dot is a legal break point now. */
+				overflow-wrap: normal;
+				word-break: normal;
+			}
+			.intro p {
+				color: var(--text);
+				margin: 0;
+				/* A: the description, promoted to a proper lead instead of a
+				   small muted line. Broad and durable — not tied to any single
+				   post. */
+				font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem);
+				line-height: 1.5;
+				max-width: 26rem;
+			}
+			.about-link {
+				margin-top: 1.5rem !important;
+				font-size: 0.95rem !important;
+			}
+			.about-link a {
+				border-bottom: none;
+			}
+			.about-link a:hover {
+				border-bottom: 1px solid currentColor;
+			}
+
+			.recent h2 {
+				margin: 0 0 1.5rem 0;
+				font-size: 0.78rem;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.14em;
+				color: var(--text-faint);
+			}
+			.recent ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
+			.recent li a {
+				display: block;
+				color: inherit;
+				border-bottom: none;
+			}
+			.recent .title {
+				margin: 0 0 0.2rem 0;
+				font-size: 1.2rem;
+				color: var(--text);
+				transition: color 120ms ease;
+			}
+			.recent .date {
+				margin: 0 0 0.4rem 0;
+				color: var(--text-faint);
+				font-size: 0.85rem;
+			}
+			.recent .summary {
+				margin: 0;
+				color: var(--text-muted);
+				font-size: 0.98rem;
+			}
+			.recent li a:hover .title {
+				color: var(--accent);
+			}
+			.more {
+				margin-top: 2.5rem;
+				font-size: 0.95rem;
+			}
+			.more a {
+				border-bottom: none;
+			}
+			.more a:hover {
+				border-bottom: 1px solid currentColor;
+			}
+		</style>
+	</body>
+</html>

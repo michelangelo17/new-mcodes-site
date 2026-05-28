@@ -1,0 +1,34 @@
+---
+import SocialIcons from './SocialIcons.astro';
+const year = new Date().getFullYear();
+---
+
+<footer>
+	<div class="inner">
+		<p class="copy">&copy; {year} Michelangelo Markus.</p>
+		<SocialIcons />
+	</div>
+</footer>
+
+<style>
+	footer {
+		border-top: 1px solid var(--border);
+		padding: 2em 0 3em;
+		margin-top: 4em;
+		color: var(--text-muted);
+	}
+	.inner {
+		max-width: var(--wide);
+		margin-inline: auto;
+		padding-inline: var(--gutter);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+		flex-wrap: wrap;
+	}
+	.copy {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+</style>

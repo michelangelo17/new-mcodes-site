@@ -1,0 +1,109 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+// Newest first. The collection name `posts` matches the frontmatter contract
+// in `src/content.config.ts` and the MCP server's POSTS_DIR (server reads the
+// same markdown files).
+const posts = (await getCollection('posts')).sort(
+	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Writing · ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Writing</h1>
+			<ul class="posts">
+				{
+					posts.map((post) => (
+						<li>
+							<a href={`/blog/${post.id}/`}>
+								<p class="date">
+									<FormattedDate date={post.data.date} />
+								</p>
+								<div class="body">
+									<h2 class="title">{post.data.title}</h2>
+									<p class="summary">{post.data.summary}</p>
+								</div>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</main>
+		<Footer />
+
+		<style>
+			main {
+				max-width: var(--wide);
+			}
+			main h1 {
+				margin-bottom: 2.5rem;
+			}
+			.posts {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0;
+			}
+			.posts li a {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 0.4rem;
+				color: inherit;
+				border-bottom: 1px solid var(--border);
+				padding: 2rem 0;
+			}
+			.posts li:first-child a {
+				padding-top: 0;
+			}
+			.posts li:last-child a {
+				border-bottom: none;
+			}
+			/* Desktop: date in a fixed left column beside the entry. */
+			@media (min-width: 40rem) {
+				.posts li a {
+					grid-template-columns: 8.5rem minmax(0, 42rem);
+					gap: 2.5rem;
+					align-items: baseline;
+				}
+			}
+			.date {
+				margin: 0;
+				color: var(--text-faint);
+				font-size: 0.85rem;
+				padding-top: 0.15rem;
+			}
+			.body {
+				min-width: 0;
+			}
+			.title {
+				margin: 0 0 0.3rem 0;
+				font-size: 1.3rem;
+				font-weight: 700;
+				color: var(--text);
+				transition: color 120ms ease;
+			}
+			.summary {
+				margin: 0;
+				color: var(--text-muted);
+				font-size: 0.98rem;
+			}
+			.posts li a:hover .title {
+				color: var(--accent);
+			}
+		</style>
+	</body>
+</html>

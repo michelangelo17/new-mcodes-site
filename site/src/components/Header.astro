@@ -1,0 +1,66 @@
+---
+import { SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+import SocialIcons from './SocialIcons.astro';
+---
+
+<header>
+	<nav>
+		<a class="brand" href="/">{SITE_TITLE}</a>
+		<div class="links">
+			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+		</div>
+		<div class="socials">
+			<SocialIcons />
+		</div>
+	</nav>
+</header>
+
+<style>
+	header {
+		border-bottom: 1px solid var(--border);
+		/* Slight elevation so the bar reads as its own surface, distinct
+		   from the page background. Without this the header text and the
+		   body text float on the same plane and the bar visually disappears. */
+		background: var(--bg-elev);
+		position: sticky;
+		top: 0;
+		z-index: 10;
+	}
+	nav {
+		max-width: var(--wide);
+		margin-inline: auto;
+		padding: 0.9em var(--gutter);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+	}
+	.brand {
+		font-family: var(--font-mono), ui-monospace, monospace;
+		font-weight: 700;
+		font-size: 0.95rem;
+		color: var(--text);
+		letter-spacing: -0.01em;
+		border-bottom: none;
+	}
+	.brand:hover {
+		color: var(--accent);
+		border-bottom: none;
+	}
+	.links {
+		display: flex;
+		gap: 1.25em;
+		margin-left: auto;
+		margin-right: 1.25em;
+	}
+	@media (max-width: 540px) {
+		.socials {
+			display: none;
+		}
+		.links {
+			margin-right: 0;
+		}
+	}
+</style>

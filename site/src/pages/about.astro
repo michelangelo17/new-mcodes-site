@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets'
+import Layout from '../layouts/Page.astro'
+import me from '../assets/me.jpg'
+---
+
+<Layout title='About' description='About Michelangelo Markus and this site.'>
+    <Image src={me} alt="Michelangelo Markus" class="bio-photo" width={150} densities={[1, 2]} />
+    <p>
+        I'm Michelangelo, a Senior Cloud Consultant at superluminar in Berlin.
+        The harder problems lately are in generative AI, alongside a deepening
+        interest in cloud sovereignty and what it means to keep workloads under
+        European control. Most of the work is still on AWS.
+    </p>
+    <p>
+        The route here wasn't a straight line. Two years teaching computer
+        science in Cambodia, then retraining into engineering through BloomTech,
+        three years as a public-sector Solutions Architect at AWS (Central SA,
+        then NPO Research), some independent consulting, and eventually Berlin.
+    </p>
+    <p>
+        I write about what surprises me. Right now that's the layer above the
+        harness: what breaks at the seams when one agent has to trust another,
+        what identity and delegation actually mean across managed runtimes, and
+        the measurements that would let any of this be engineered rather than
+        asserted. Cloud sovereignty is the other thread I keep returning to.
+    </p>
+    <p>
+        Off-screen I'm rarely in my own time zone. Motorcycles, music festivals,
+        and bouldering when I am.
+    </p>
+    <p>
+        <a href='mailto:m@michelangelo.codes'>m@michelangelo.codes</a>
+    </p>
+</Layout>
+
+<style>
+	/* Portrait floated beside the bio on wider screens; stacks on top on
+	   narrow ones so it never crowds the text. */
+	.bio-photo {
+		float: right;
+		width: 140px;
+		height: 140px;
+		object-fit: cover;
+		border-radius: 18px;
+		margin: 0 0 1rem 1.5rem;
+	}
+	@media (max-width: 32rem) {
+		.bio-photo {
+			float: none;
+			margin: 0 0 1.5rem 0;
+		}
+	}
+</style>
