@@ -1,0 +1,10 @@
+# Keep the build context lean and force fresh installs/builds inside the image.
+# Note: site/src/content/posts is intentionally NOT ignored — the runtime stage
+# copies the posts in as the MCP server's data source.
+**/node_modules
+**/dist
+site/.astro
+**/.git
+**/*.log
+npm-debug.log*
+.DS_Store

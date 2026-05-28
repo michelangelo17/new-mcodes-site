@@ -1,0 +1,52 @@
+---
+// Giscus comments, backed by GitHub Discussions. Config lives in consts.ts.
+//
+// The giscus client reads its own data-* attributes off the <script> tag and
+// injects an iframe in its place. We build that tag at runtime from the config
+// (passed in via define:vars) so the IDs live in one place. The section only
+// renders once both IDs are set, so the site works before Giscus is wired up.
+import { GISCUS } from '../consts';
+
+const enabled = Boolean(GISCUS.repoId && GISCUS.categoryId);
+---
+
+{
+	enabled && (
+		<section class="comments">
+			<h2>Comments</h2>
+			<div id="giscus-container" />
+			<script is:inline define:vars={{ giscus: GISCUS }}>
+				const s = document.createElement('script');
+				s.src = 'https://giscus.app/client.js';
+				s.setAttribute('data-repo', giscus.repo);
+				s.setAttribute('data-repo-id', giscus.repoId);
+				s.setAttribute('data-category', giscus.category);
+				s.setAttribute('data-category-id', giscus.categoryId);
+				s.setAttribute('data-mapping', 'pathname');
+				s.setAttribute('data-strict', '1');
+				s.setAttribute('data-reactions-enabled', '1');
+				s.setAttribute('data-emit-metadata', '0');
+				s.setAttribute('data-input-position', 'top');
+				// Follows the OS light/dark setting, like the rest of the site.
+				s.setAttribute('data-theme', 'preferred_color_scheme');
+				s.setAttribute('data-lang', 'en');
+				s.setAttribute('data-loading', 'lazy');
+				s.crossOrigin = 'anonymous';
+				s.async = true;
+				document.getElementById('giscus-container').appendChild(s);
+			</script>
+		</section>
+	)
+}
+
+<style>
+	.comments {
+		margin-top: 3.5rem;
+		padding-top: 2rem;
+		border-top: 1px solid var(--border);
+	}
+	.comments h2 {
+		font-size: 1.1rem;
+		margin: 0 0 1.25rem 0;
+	}
+</style>
