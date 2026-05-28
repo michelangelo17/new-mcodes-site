@@ -9,6 +9,7 @@ import SocialIcons from './SocialIcons.astro';
 		<a class="brand" href="/">{SITE_TITLE}</a>
 		<div class="links">
 			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/mcp">MCP</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
 		<div class="socials">
@@ -20,9 +21,7 @@ import SocialIcons from './SocialIcons.astro';
 <style>
 	header {
 		border-bottom: 1px solid var(--border);
-		/* Slight elevation so the bar reads as its own surface, distinct
-		   from the page background. Without this the header text and the
-		   body text float on the same plane and the bar visually disappears. */
+		/* Elevated surface so the bar reads as distinct from the page. */
 		background: var(--bg-elev);
 		position: sticky;
 		top: 0;

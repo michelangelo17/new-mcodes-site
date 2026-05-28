@@ -7,23 +7,11 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://michelangelo.codes',
-	// Explicitly static. This site is served as plain files by the Express
-	// host in the deploy container; the MCP server lives next to it but the
-	// site itself has no runtime requirements.
 	output: 'static',
 	integrations: [mdx(), sitemap()],
+	// Self-hosted from Fontsource (woff2 in src/assets/fonts): Fira Code for
+	// code + brand, Space Grotesk for headings, iA Writer Quattro for body.
 	fonts: [
-		// Three-font split, each in the role it's good at:
-		//   Fira Code (mono)      -> code blocks + the brand wordmark.
-		//   Space Grotesk (head)  -> headings, where its display character is
-		//                            an asset and reading fatigue is moot.
-		//   iA Writer Quattro     -> body. Duospaced: keeps the technical DNA
-		//                            but reads far easier than mono for prose.
-		// All three are self-hosted: the woff2 files live in src/assets/fonts
-		// (pulled from Fontsource), so there is no runtime third-party font
-		// request at all. Self-hosting Fira Code from Fontsource also ships its
-		// full OpenType feature set, which is what makes the code ligatures
-		// (=>, ->, != ...) actually fire — see global.css.
 		{
 			provider: fontProviders.local(),
 			name: 'Fira Code',

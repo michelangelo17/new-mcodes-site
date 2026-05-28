@@ -6,9 +6,6 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-// The landing page doubles as a most-recent-writing teaser. The full list
-// lives at /blog. Keep the top few only — anything older belongs on the index
-// page, not the front door.
 const recent = (await getCollection('posts'))
 	.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
 	.slice(0, 4);
@@ -24,9 +21,7 @@ const recent = (await getCollection('posts'))
 		<main>
 			<div class="home">
 				<section class="intro">
-					{/* Allow a break only after the dot, so the wordmark stacks
-					   as "michelangelo." / "codes" if it must wrap — never
-					   mid-segment. */}
+					{/* <wbr> after the dot: wordmark stacks cleanly if it wraps. */}
 					<h1 set:html={SITE_TITLE.replace(/\./g, '.<wbr>')}></h1>
 					<p>{SITE_DESCRIPTION}</p>
 					<p class="about-link"><a href="/about">More about me →</a></p>
@@ -53,9 +48,7 @@ const recent = (await getCollection('posts'))
 				</section>
 			</div>
 
-			{/* B: an abstract node/edge motif — agents and the seams between
-			    them, the thing the writing is about. Decorative only, sits
-			    behind the content at low contrast. */}
+			{/* Decorative node/edge motif behind the content. */}
 			<svg class="motif" viewBox="0 0 480 360" fill="none" aria-hidden="true">
 				<g class="edges">
 					<line x1="58" y1="70" x2="205" y2="135" />
@@ -80,8 +73,7 @@ const recent = (await getCollection('posts'))
 		<Footer />
 
 		<style>
-			/* Soft summer-sky glow behind the hero, home page only. Layered
-			   over the base background; sits below the (opaque) header. */
+			/* Summer-sky glow behind the hero, home only. */
 			body.landing {
 				background:
 					radial-gradient(48rem 30rem at 60% -4rem, var(--glow), transparent 70%),
@@ -91,9 +83,6 @@ const recent = (await getCollection('posts'))
 
 			main {
 				max-width: var(--wide);
-				/* Center the hero block vertically in the leftover viewport
-				   height. When the post list grows past one screen this just
-				   behaves like top-aligned. */
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
@@ -107,7 +96,6 @@ const recent = (await getCollection('posts'))
 				z-index: 1;
 			}
 
-			/* B: node/seam motif, behind the content. */
 			.motif {
 				position: absolute;
 				top: 1.5rem;
@@ -129,15 +117,12 @@ const recent = (await getCollection('posts'))
 			.motif .nodes circle.hot {
 				fill: var(--accent);
 			}
-			/* On a single column (mobile/tablet) the motif would collide with
-			   text; hide it there. */
 			@media (max-width: 60rem) {
 				.motif {
 					display: none;
 				}
 			}
-			/* Two columns on desktop: identity on the left, writing on the
-			   right. The left column sticks as you scroll the list. */
+			/* Two columns on desktop: identity (sticky) left, writing right. */
 			@media (min-width: 60rem) {
 				.home {
 					grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -154,17 +139,12 @@ const recent = (await getCollection('posts'))
 				margin: 0 0 0.75rem 0;
 				font-size: clamp(2.1rem, 1.5rem + 2vw, 2.9rem);
 				line-height: 1.05;
-				/* Override the body's break-anywhere wrapping; only the <wbr>
-				   after the dot is a legal break point now. */
 				overflow-wrap: normal;
 				word-break: normal;
 			}
 			.intro p {
 				color: var(--text);
 				margin: 0;
-				/* A: the description, promoted to a proper lead instead of a
-				   small muted line. Broad and durable — not tied to any single
-				   post. */
 				font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem);
 				line-height: 1.5;
 				max-width: 26rem;

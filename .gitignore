@@ -1,0 +1,31 @@
+# Dependencies & build output (site/, server/)
+node_modules/
+dist/
+.astro/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+
+# OpenTofu / Terraform (infra/)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
+crash.log
+
+# OS / editor
+.DS_Store
+.idea/
+
+# Initial Setup Doc
+SETUP.md

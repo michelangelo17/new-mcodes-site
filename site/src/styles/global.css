@@ -1,31 +1,10 @@
-/*
-  Global styles. Single palette token set, light by default, dark via
-  prefers-color-scheme. One accent (deep summer-sky blue) used sparingly.
-
-  Three fonts, each in its lane:
-    --font-heading  Space Grotesk     (headings)
-    --font-body     iA Writer Quattro (body)
-    --font-mono     Fira Code         (code + brand; ligatures on)
-  All self-hosted via Astro's local provider — no runtime third-party request.
-
-  Layout is fluid: a reading-width column for prose, a wider one for chrome and
-  the landing/list pages, and a gutter that grows with the viewport so the page
-  fills a desktop screen instead of looking like a phone in the middle of it.
-
-  Originally based on Bear Blog's default
-  (https://github.com/HermanMartinus/bearblog), then rebuilt for a quieter,
-  more modern feel.
-*/
+/* Palette tokens (light default, dark via prefers-color-scheme), layout
+   widths, and the font vars (injected by Astro's <Font>). */
 
 :root {
 	color-scheme: light dark;
 
-	/* --font-body, --font-heading and --font-mono are injected by Astro's
-	   <Font> component (see astro.config.mjs). */
-
-	/* Layout widths. Reading stays a comfortable measure for long-form text;
-	   wide is for chrome and pages without long prose; gutter scales with the
-	   viewport. */
+	/* reading = prose measure; wide = chrome + listing pages. */
 	--reading: 52rem;
 	--wide: 86rem;
 	--gutter: clamp(1.25rem, 4vw, 4rem);
@@ -80,7 +59,6 @@ body {
 	padding: 0;
 	background: var(--bg);
 	color: var(--text);
-	/* Scales ~16px (mobile) to ~18.5px (large desktop). */
 	font-size: clamp(1rem, 0.96rem + 0.2vw, 1.15rem);
 	line-height: 1.7;
 	text-align: left;
@@ -88,17 +66,13 @@ body {
 	overflow-wrap: break-word;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	/* Sticky-footer layout: header / main / footer stack full-height so the
-	   footer pins to the bottom of the viewport on short pages instead of
-	   floating with a void beneath it. */
+	/* Sticky footer: stack full-height so the footer pins to the bottom. */
 	display: flex;
 	flex-direction: column;
 	min-height: 100dvh;
 }
 
-/* Default content container: the reading column. Landing and list pages widen
-   this to var(--wide) in their own scoped styles. flex: 1 makes main absorb
-   the leftover height, pushing the footer down. */
+/* Reading column; listing pages widen to var(--wide) in their own styles. */
 main {
 	flex: 1 0 auto;
 	width: 100%;
@@ -174,9 +148,7 @@ img {
 code,
 pre {
 	font-family: var(--font-mono), ui-monospace, Menlo, Consolas, monospace;
-	/* Fira Code's programming ligatures (=>, ->, !=, >=, ===, etc). `calt`
-	   (contextual alternates) drives them; the self-hosted Fontsource build
-	   ships it, which is the whole reason for the swap. */
+	/* Fira Code ligatures. */
 	font-feature-settings: 'calt' 1;
 	font-variant-ligatures: contextual;
 }

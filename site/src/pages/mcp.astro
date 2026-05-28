@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Page.astro';
+---
+
+<Layout title="MCP" description="Connect an agent to the michelangelo.codes MCP server.">
+	<p>
+		The writing here is also available over
+		<a href="https://modelcontextprotocol.io">MCP</a> (Model Context Protocol),
+		so an agent can read and search it directly — no scraping. It's read-only
+		and public, and no model runs on my side: your agent brings its own.
+	</p>
+
+	<h2>Endpoint</h2>
+	<p>Streamable HTTP:</p>
+	<pre><code>https://mcp.michelangelo.codes/mcp</code></pre>
+
+	<h2>Add it</h2>
+	<p>Claude Code:</p>
+	<pre><code>claude mcp add --transport http mcodes https://mcp.michelangelo.codes/mcp</code></pre>
+	<p>Any other client: add a remote / HTTP MCP server pointing at that URL.</p>
+
+	<h2>What's exposed</h2>
+	<p>Resources:</p>
+	<ul>
+		<li><code>{'posts://index'}</code> — every post with metadata.</li>
+		<li><code>{'posts://{slug}'}</code> — one post as Markdown with frontmatter.</li>
+	</ul>
+	<p>Tools:</p>
+	<ul>
+		<li><code>search_posts(query, limit?)</code> — keyword search, ranked hits.</li>
+		<li><code>get_post(slug)</code> — the full Markdown of a post.</li>
+	</ul>
+</Layout>

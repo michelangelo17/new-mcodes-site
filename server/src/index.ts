@@ -1,55 +1,78 @@
-// index.ts
-//
-// One container, two jobs:
-//   1. Serve the built static Astro site (the writing).
-//   2. Mount the MCP server at /mcp.
-//
-// Both are stateless, so the whole thing scales to zero on Serverless
-// Containers with no idle cost. When you add the metered Layer-2 "ask my
-// writing" widget later, split THAT into its own container so a flaky/rate-
-// limited model call can never take the writing or the MCP endpoint down. For
-// now there is nothing metered here, so one container is the right size.
+// MCP host on Node's built-in http — the static site is served separately, so
+// this process is only the MCP endpoint and needs no framework.
+// Stateless transport: fresh server + transport per request.
 
-import express from "express";
-import { join } from "node:path";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { buildServer } from "./mcp.js";
 
-const PORT = Number(process.env.PORT ?? 8080); // Serverless Containers inject PORT
-const SITE_DIST = process.env.SITE_DIST ?? join(process.cwd(), "..", "site", "dist");
+const PORT = Number(process.env.PORT ?? 8080);
 
-const app = express();
+const sendJson = (
+  res: ServerResponse,
+  status: number,
+  body: unknown,
+  headers: Record<string, string> = {},
+) => {
+  res.writeHead(status, { "content-type": "application/json", ...headers });
+  res.end(JSON.stringify(body));
+};
 
-app.get("/healthz", (_req, res) => {
-  res.status(200).json({ ok: true });
-});
+const readJsonBody = async (req: IncomingMessage): Promise<unknown> => {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(chunk as Buffer);
+  if (chunks.length === 0) return undefined;
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+};
 
-// MCP endpoint, stateless mode: a fresh server + transport per request, no
-// session state held between requests (the correct shape for scale-to-zero).
-app.post("/mcp", express.json(), async (req, res) => {
-  const server = buildServer();
-  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-  res.on("close", () => {
-    transport.close();
-    server.close();
-  });
-  try {
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  } catch (err) {
-    if (!res.headersSent) res.status(500).json({ error: "internal error" });
-    server.close();
+const httpServer = createServer(async (req, res) => {
+  const method = req.method ?? "GET";
+  const path = new URL(req.url ?? "/", "http://localhost").pathname;
+
+  if (method === "GET" && path === "/healthz") {
+    return sendJson(res, 200, { ok: true });
   }
+
+  if (method === "GET" && path === "/") {
+    return sendJson(res, 200, {
+      name: "michelangelo.codes MCP",
+      description: "Read-only MCP server exposing the blog's writing. POST JSON-RPC to /mcp.",
+      site: "https://michelangelo.codes",
+    });
+  }
+
+  if (path === "/mcp") {
+    // Stateless mode has no server-initiated SSE stream, so only POST is used.
+    if (method !== "POST") {
+      return sendJson(res, 405, { error: "Method Not Allowed" }, { Allow: "POST" });
+    }
+
+    let body: unknown;
+    try {
+      body = await readJsonBody(req);
+    } catch {
+      return sendJson(res, 400, { error: "invalid JSON" });
+    }
+
+    const server = buildServer();
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+    res.on("close", () => {
+      transport.close();
+      server.close();
+    });
+    try {
+      await server.connect(transport);
+      await transport.handleRequest(req, res, body);
+    } catch {
+      if (!res.headersSent) sendJson(res, 500, { error: "internal error" });
+      server.close();
+    }
+    return;
+  }
+
+  sendJson(res, 404, { error: "Not Found" });
 });
 
-// Stateless mode has no server-initiated SSE stream, so GET/DELETE are not used.
-app.all("/mcp", (_req, res) => {
-  res.status(405).set("Allow", "POST").json({ error: "Method Not Allowed" });
-});
-
-// Everything else: the static site.
-app.use(express.static(SITE_DIST));
-
-app.listen(PORT, () => {
-  console.log(`listening on :${PORT}  (site: ${SITE_DIST})`);
+httpServer.listen(PORT, () => {
+  console.log(`mcp server listening on :${PORT}`);
 });

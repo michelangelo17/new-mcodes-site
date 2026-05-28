@@ -6,8 +6,6 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-// Props are the post's frontmatter, validated against the schema in
-// `src/content.config.ts`. Fields: title, date, tags, summary, canonicalUrl?.
 type Props = CollectionEntry<'posts'>['data'];
 
 const { title, date, tags, summary, canonicalUrl } = Astro.props;
@@ -16,11 +14,7 @@ const { title, date, tags, summary, canonicalUrl } = Astro.props;
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={summary} />
-		{
-			/* If the canonical version of this piece lives elsewhere
-			   (e.g. dev.to), tell search engines so the cross-post here
-			   doesn't compete with it for ranking. */
-		}
+		{/* Point search engines at the canonical home when cross-posted. */}
 		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 	</head>
 

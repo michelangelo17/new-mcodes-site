@@ -1,35 +1,20 @@
-// mcp.ts
-//
-// THE SCHEMA: what your site exposes to other people's agents.
-//
-// The inversion of the usual "RAG wrapper": no model lives here. This server
-// publishes your writing (and, later, the artefact-one findings) as MCP
-// resources and tools. A connecting agent brings its own model and its own
-// inference budget. Your cost is just the container, which scales to zero.
-//
-// Two kinds of surface:
-//   RESOURCES  = addressable content an agent can read   (posts://index, posts://{slug})
-//   TOOLS      = actions an agent can call                (search_posts, get_post, query_findings)
-//
-// A note that is itself a small preview of artefact one: every line below is a
-// trust-boundary decision. This server is read-only, exposes only published
-// material, and advertises query_findings only once real data exists. What you
-// choose NOT to expose is part of the design, not an afterthought.
+// MCP surface: read-only, published material only. No model here — the
+// connecting agent brings its own.
+//   resources: posts://index, posts://{slug}
+//   tools:     search_posts, get_post, query_findings (gated)
 
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { buildIndex, getAllPosts, getPost } from "./posts.js";
 import { searchPosts } from "./search.js";
 
-export function buildServer(): McpServer {
+export const buildServer = (): McpServer => {
   const server = new McpServer({
     name: "blog",
     version: "0.1.0",
   });
 
-  // ---- RESOURCE: the index ------------------------------------------------
-  // A single addressable list of everything published, with metadata. An agent
-  // fetches this to discover what is here without scraping HTML.
+  // posts://index — metadata list of everything published.
   server.registerResource(
     "post-index",
     "posts://index",
@@ -49,10 +34,8 @@ export function buildServer(): McpServer {
     }),
   );
 
-  // ---- RESOURCE: a single post by slug ------------------------------------
-  // Templated resource: posts://{slug}. The `list` callback enumerates every
-  // post so an agent can browse them as discrete resources; the read callback
-  // returns clean Markdown plus frontmatter, not rendered HTML.
+  // posts://{slug} — one post as Markdown + frontmatter. The list callback
+  // enumerates posts as discrete resources.
   server.registerResource(
     "post",
     new ResourceTemplate("posts://{slug}", {
@@ -89,9 +72,6 @@ export function buildServer(): McpServer {
     },
   );
 
-  // ---- TOOL: search_posts -------------------------------------------------
-  // Keyword search (see search.ts). Returns ranked hits with snippets so an
-  // agent can decide which posts to fetch in full.
   server.registerTool(
     "search_posts",
     {
@@ -108,7 +88,6 @@ export function buildServer(): McpServer {
     },
   );
 
-  // ---- TOOL: get_post -----------------------------------------------------
   server.registerTool(
     "get_post",
     {
@@ -123,15 +102,8 @@ export function buildServer(): McpServer {
     },
   );
 
-  // ---- TOOL: query_findings (gated) ---------------------------------------
-  // The standout, switched on only when the artefact-one dataset exists. This
-  // is the piece that makes the server original: it exposes your *measurements*
-  // as a composable tool other agents can build on, which is protocol-layer
-  // participation rather than tool-building on top of the layer.
-  //
-  // The contract is defined now so the shape is concrete; FINDINGS_ENABLED
-  // keeps it unadvertised until the data is real. Do not let a later edit
-  // upgrade a documented-but-unmeasured field into a reported result.
+  // Gated behind FINDINGS_ENABLED: contract defined, but dark until the dataset
+  // is real. Returns "not published" rather than fabricated rows.
   if (process.env.FINDINGS_ENABLED === "true") {
     server.registerTool(
       "query_findings",
@@ -144,13 +116,10 @@ export function buildServer(): McpServer {
         },
       },
       async () => ({
-        // Replace with a read against the published dataset (CSV/Parquet shipped
-        // with the image or fetched from Object Storage). Returns rows + the CI,
-        // never a single run, matching the study's own rigour bar.
         content: [{ type: "text", text: JSON.stringify({ status: "dataset not yet published" }) }],
       }),
     );
   }
 
   return server;
-}
+};
