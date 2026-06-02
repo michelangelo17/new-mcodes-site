@@ -3,6 +3,12 @@
 # Scaleway creds and SCW_BUCKET + SCW_S3_ENDPOINT set (see SETUP.md).
 set -euo pipefail
 
+# Auto-load root .env if present so locally you don't need to export anything.
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -f "$ROOT/.env" ]; then
+  set -a; . "$ROOT/.env"; set +a
+fi
+
 : "${SCW_BUCKET:?set SCW_BUCKET}"
 : "${SCW_S3_ENDPOINT:?set SCW_S3_ENDPOINT}"
 SCW_REGION="${SCW_REGION:-fr-par}"
