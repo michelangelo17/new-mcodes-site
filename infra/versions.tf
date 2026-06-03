@@ -16,8 +16,8 @@ terraform {
   # `tofu init`. Backend reads AWS_ACCESS_KEY_ID/SECRET — set those to the
   # Scaleway keys (see SETUP.md).
   # State in Scaleway Object Storage (S3-compatible). Bucket must exist before
-  # `tofu init`. Backend reads AWS_ACCESS_KEY_ID/SECRET — set those to the
-  # Scaleway keys (see SETUP.md).
+  # `tofu init`. Pass Scaleway creds at init via `-backend-config` flags (AWS_*
+  # env in this project is reserved for real AWS — see SETUP.md).
   backend "s3" {
     bucket = "mcodes-tofu-state"
     key    = "infra.tfstate"

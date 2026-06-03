@@ -9,9 +9,17 @@ if [ -f "$ROOT/.env" ]; then
   set -a; . "$ROOT/.env"; set +a
 fi
 
+: "${SCW_ACCESS_KEY:?set SCW_ACCESS_KEY}"
+: "${SCW_SECRET_KEY:?set SCW_SECRET_KEY}"
 : "${SCW_BUCKET:?set SCW_BUCKET}"
 : "${SCW_S3_ENDPOINT:?set SCW_S3_ENDPOINT}"
 SCW_REGION="${SCW_REGION:-fr-par}"
+
+# aws CLI talks to Scaleway via --endpoint-url, using the Scaleway keys under
+# the AWS_* names. Drop any real-AWS session token from the surrounding env.
+export AWS_ACCESS_KEY_ID="$SCW_ACCESS_KEY"
+export AWS_SECRET_ACCESS_KEY="$SCW_SECRET_KEY"
+unset AWS_SESSION_TOKEN
 
 cd "$(dirname "$0")/../site"
 npm ci

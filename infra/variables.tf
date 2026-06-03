@@ -42,21 +42,15 @@ variable "findings_enabled" {
   description = "Gates the query_findings tool. Keep false until the dataset is real."
 }
 
-# --- DNS (Route 53, AWS) ------------------------------------------------------
+# --- AWS (Route 53 + ACM + CloudFront + OIDC) ---------------------------------
 
 variable "route53_zone_id" {
   type        = string
   description = "Route 53 hosted zone ID for the domain."
 }
 
-variable "aws_access_key" {
+variable "github_repo" {
   type        = string
-  sensitive   = true
-  description = "AWS access key for the Route 53 provider (real AWS creds)."
-}
-
-variable "aws_secret_key" {
-  type        = string
-  sensitive   = true
-  description = "AWS secret key for the Route 53 provider (real AWS creds)."
+  default     = "michelangelo17/new-mcodes-site"
+  description = "GitHub <owner>/<repo> allowed to assume the deploy role via OIDC."
 }
