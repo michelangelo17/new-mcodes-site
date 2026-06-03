@@ -45,10 +45,20 @@ jobs:
       - name: tofu init
         working-directory: infra
         # Scaleway creds passed explicitly (the AWS_* env above is real AWS).
+        # Retry: provider downloads occasionally drop mid-stream.
         run: |
-          tofu init \
+          n=0
+          until tofu init \
             -backend-config="access_key=${SCW_ACCESS_KEY}" \
-            -backend-config="secret_key=${SCW_SECRET_KEY}"
+            -backend-config="secret_key=${SCW_SECRET_KEY}"; do
+            n=$((n + 1))
+            if [ "$n" -ge 3 ]; then
+              echo "init failed after $n attempts"
+              exit 1
+            fi
+            echo "init failed (attempt $n), retrying in 10s..."
+            sleep 10
+          done
 
       - name: Ensure registry namespace
         working-directory: infra
