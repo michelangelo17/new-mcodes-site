@@ -25,7 +25,6 @@ jobs:
 
       TF_VAR_route53_zone_id: ${{ secrets.ROUTE53_ZONE_ID }}
       TF_VAR_deploy_application_id: ${{ secrets.SCW_APPLICATION_ID }}
-      TF_VAR_deploy_application_id: ${{ secrets.SCW_APPLICATION_ID }}
 
       REGISTRY: rg.fr-par.scw.cloud
       IMAGE_NAME: ${{ secrets.SCW_REGISTRY_NS }}/mcodes-mcp
