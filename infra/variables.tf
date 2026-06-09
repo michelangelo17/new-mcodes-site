@@ -11,6 +11,11 @@ variable "site_bucket_name" {
   description = "Object Storage bucket holding the built static site."
 }
 
+variable "deploy_application_id" {
+  type        = string
+  description = "Scaleway IAM application ID of the deploy key's bearer. Granted full access in the bucket policy so applying it can't lock the pipeline out."
+}
+
 variable "site_domain" {
   type        = string
   default     = "michelangelo.codes"
