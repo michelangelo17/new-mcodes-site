@@ -38,6 +38,7 @@ resource "aws_acm_certificate_validation" "site" {
 
 resource "aws_cloudfront_distribution" "site" {
   enabled             = true
+  is_ipv6_enabled     = true
   default_root_object = "index.html"
   aliases             = [var.site_domain, "www.${var.site_domain}"]
   price_class         = "PriceClass_100" # NA + EU edges
@@ -61,6 +62,7 @@ resource "aws_cloudfront_distribution" "site" {
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
+    compress               = true
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Managed-CachingOptimized
   }
 

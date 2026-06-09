@@ -6,6 +6,9 @@ resource "aws_route53_record" "apex" {
   zone_id = var.route53_zone_id
   name    = var.site_domain
   type    = "A"
+  # Overwrite any record the old site left on these names — they should point
+  # at this distribution now.
+  allow_overwrite = true
 
   alias {
     name                   = aws_cloudfront_distribution.site.domain_name
@@ -15,9 +18,10 @@ resource "aws_route53_record" "apex" {
 }
 
 resource "aws_route53_record" "www" {
-  zone_id = var.route53_zone_id
-  name    = "www.${var.site_domain}"
-  type    = "A"
+  zone_id         = var.route53_zone_id
+  name            = "www.${var.site_domain}"
+  type            = "A"
+  allow_overwrite = true
 
   alias {
     name                   = aws_cloudfront_distribution.site.domain_name
