@@ -13,9 +13,8 @@ resource "scaleway_object_bucket_website_configuration" "site" {
     suffix = "index.html"
   }
 
-  # Point at a real 404.html once the site has one.
   error_document {
-    key = "index.html"
+    key = "404.html"
   }
 }
 
