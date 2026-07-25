@@ -33,8 +33,10 @@ s3=(aws s3 --endpoint-url "$SCW_S3_ENDPOINT" --region "$SCW_REGION")
   --exclude "*.html" \
   --cache-control "public, max-age=31536000, immutable"
 
-# HTML: always revalidate.
+# HTML: always revalidate. --delete here too, or pages removed from the site
+# would linger in the bucket (pass 1 excludes *.html, so it can't prune them).
 "${s3[@]}" sync dist/ "s3://${SCW_BUCKET}/" \
+  --delete \
   --exclude "*" --include "*.html" \
   --cache-control "public, max-age=0, must-revalidate" \
   --content-type "text/html; charset=utf-8"
